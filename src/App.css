@@ -1,0 +1,457 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #121212;
+  color: white;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  min-height: 100vh;
+  background: #121212;
+}
+
+/* HEADER */
+
+.header {
+  text-align: center;
+  background: linear-gradient(135deg, #111827, #1e1e1e);
+  padding: 28px 15px;
+  border-bottom: 2px solid #22c55e;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+}
+
+.header h1 {
+  margin: 0;
+  color: #ffd700;
+  font-size: 22px;
+}
+
+.header p {
+  margin: 6px 0 0;
+  color: #aaa;
+  font-size: 13px;
+}
+
+/* TABS */
+
+.tabs {
+  display: flex;
+  background: #1e1e1e;
+  border-bottom: 1px solid #333;
+}
+
+.tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: #888;
+  padding: 15px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.tab.active {
+  color: #ffd700;
+  border-bottom: 3px solid #ffd700;
+  background: #262626;
+}
+
+/* ADD BUTTON */
+
+.add-button {
+  display: block;
+  width: calc(100% - 30px);
+  max-width: 900px;
+  margin: 15px auto 5px;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  background: #ffd700;
+  color: #000;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* CONTENT */
+
+.content {
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
+  padding: 10px 15px 30px;
+}
+
+/* TIP CARD */
+.tip-card {
+  background: #1e1e1e;
+  padding: 20px;
+  margin: 14px 0;
+  border-radius: 14px;
+  border: 1px solid #333;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 7px;
+}
+
+.league {
+  color: #888;
+  font-size: 14px;
+}
+
+.status {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.tip-card h2 {
+  color: #fff;
+  margin: 5px 0;
+  font-size: 21px;
+}
+
+.analysis {
+  color: #ccc;
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.6;
+  margin: 9px 0;
+}
+
+/* TIP BOX */
+
+.tip-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #262626;
+  padding: 14px;
+  border-radius: 10px;
+  margin-top: 12px;
+}
+
+.label {
+  display: block;
+  color: #aaa;
+  font-size: 11px;
+}
+.tip-box strong {
+  display: block;
+  font-size: 18px;
+  margin-top: 4px;
+}
+
+.tip-box small {
+  color: #ffd700;
+  font-size: 11px;
+  margin-left: 7px;
+}
+
+.odds {
+  background: #ffd700;
+  color: #000;
+  padding: 9px 16px;
+  border-radius: 8px;
+  text-align: center;
+  min-width: 85px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+}
+.final-score {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+.odds span {
+  display: block;
+ font-size: 11px;
+  font-weight: bold;
+}
+
+.odds strong {
+  display: block;
+ font-size: 19px;
+}
+
+/* CHAT */
+
+.chat {
+  max-width: 900px;
+  height: calc(100vh - 130px);
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.nickname {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 10px 15px;
+  background: #1a1a1a;
+  border-bottom: 1px solid #222;
+}
+
+.nickname span {
+  color: #aaa;
+  font-size: 12px;
+}
+
+.nickname input {
+  width: 140px;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 6px;
+  background: #262626;
+  color: #ffd700;
+  text-align: center;
+  font-weight: bold;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 15px;
+}
+
+.message {
+  width: fit-content;
+  max-width: 80%;
+  background: #222;
+  padding: 11px;
+  margin: 5px 0;
+  border-radius: 12px;
+}
+
+.message.mine {
+  margin-left: auto;
+  background: #2a3a2a;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 4px;
+}
+
+.message-header strong {
+  color: #ffd700;
+  font-size: 12px;
+}
+
+.message-header span {
+  color: #666;
+  font-size: 10px;
+}
+
+.message p {
+  margin: 0;
+  color: white;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.message-input {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background: #1e1e1e;
+  border-top: 1px solid #333;
+}
+
+.message-input input {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  padding: 0 15px;
+  border: none;
+  border-radius: 22px;
+  background: #2a2a2a;
+  color: white;
+  outline: none;
+}
+
+.message-input button {
+  border: none;
+  border-radius: 22px;
+  padding: 0 20px;
+  background: #ffd700;
+  color: #000;
+  font-weight: bold;
+}
+
+/* MODAL */
+
+.modal-background {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.modal {
+  width: 100%;
+  max-width: 550px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 22px;
+  border-radius: 15px;
+  background: #1e1e1e;
+}
+
+.modal h2 {
+  margin-top: 0;
+  margin-bottom: 18px;
+  color: #ffd700;
+  text-align: center;
+  font-size: 19px;
+}
+
+.modal input,
+.modal textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 13px;
+  border: none;
+  border-radius: 8px;
+  background: #2a2a2a;
+  color: white;
+  outline: none;
+}
+
+.modal textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.two-inputs {
+  display: flex;
+  gap: 12px;
+}
+
+.two-inputs input {
+  width: 50%;
+}
+
+.publish {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  background: #ffd700;
+  color: #000;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.cancel {
+  width: 100%;
+  padding: 13px;
+  margin-top: 5px;
+  border: none;
+  background: transparent;
+  color: #ff5555;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+  .header h1 {
+    font-size: 18px;
+  }
+
+  .header p {
+    font-size: 11px;
+  }
+
+  .tip-card h2 {
+  font-size: 18px;
+}
+.tip-box {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+  .tip-box > div:first-child {
+  text-align: center;
+  flex: 1;
+}
+
+.tip-box > div:first-child .label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.tip-box > div:first-child strong {
+  display: block;
+  font-size: 30px;
+  font-weight: 800;
+  color: #ffd700;
+}
+
+  .tip-box small {
+    display: block;
+    margin: 3px 0 0;
+  }
+
+  .two-inputs {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .two-inputs input {
+    width: 100%;
+  }
+
+  .chat {
+    height: calc(100vh - 120px);
+  }
+}
+.pick-section {
+  text-align: center;
+  flex: 1;
+}
+
+.pick-section .label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+
+
+.confidence {
+  display: block;
+  margin-top: 8px;
+  font-size: 17px;
+  font-weight: 600;
+  opacity: 0.9;
+}
