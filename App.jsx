@@ -167,15 +167,15 @@ const loginAdmin = async () => {
    return (
     <div className="app">
       <h2 style={{textAlign: 'center'}}>TIPDH CHAT TEST</h2>
-      <iframe
-  src="/chat.html"
-  title="TIPDH CHAT"
-  style={{
-    width: '100%',
-    height: '400px',
-    border: 'none'
-  }}
-></iframe>
+     <div style={{
+  background: 'red',
+  color: 'white',
+  padding: '30px',
+  fontSize: '30px',
+  textAlign: 'center'
+}}>
+  TIPDH TEST
+</div>
       {!isAdmin && (
   <div className="admin-login">
     <input
