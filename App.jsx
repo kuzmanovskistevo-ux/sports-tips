@@ -164,25 +164,29 @@ const loginAdmin = async () => {
     setInputMsg('');
   };
 useEffect(() => {
-  const script = document.createElement('script');
-  script.src = 'https://st1.chatovod.com/api/js/v1.js?4';
-  script.async = true;
+  window.chatovodOnLoad = window.chatovodOnLoad || [];
 
-  script.onload = () => {
-    if (window.chatovod) {
-      window.chatovod.addChatToDivId('chat_tipdh', {
-        host: 'tipdh.chatovod.com',
-        width: '100%',
-        height: 380,
-        defaultLanguage: 'en'
-      });
-    }
-  };
+  window.chatovodOnLoad.push(function () {
+    window.chatovod.addChatToDivId('chat_tipdh', {
+      host: 'tipdh.chatovod.com',
+      width: '100%',
+      height: 380,
+      defaultLanguage: 'en'
+    });
+  });
+
+  const script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.charset = 'UTF-8';
+  script.async = true;
+  script.src = 'https://st1.chatovod.com/api/js/v1.js?4';
 
   document.body.appendChild(script);
 
   return () => {
-    document.body.removeChild(script);
+    if (script.parentNode) {
+      script.parentNode.removeChild(script);
+    }
   };
 }, []);
    return (
