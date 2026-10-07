@@ -344,59 +344,7 @@ const loginAdmin = async () => {
         </main>
       ) : (
 
-        <main className="chat">
-
-          <div className="nickname">
-            <span>Your name:</span>
-
-            <input
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              holder="Enter name..."
-            />
-          </div>
-
-          <div className="messages">
-
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={
-                  message.user === userName
-                    ? 'message mine'
-                    : 'message'
-                }
-              >
-
-                <div className="message-header">
-                  <strong>{message.user}</strong>
-                  <span>{message.time}</span>
-                </div>
-
-                <p>{message.text}</p>
-
-              </div>
-            ))}
-
-          </div>
-
-          <div className="message-input">
-
-            <input
-              value={inputMsg}
-              onChange={(e) => setInputMsg(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') sendMessage();
-              }}
-              placeholder="Pishi poraka..."
-            />
-
-            <button onClick={sendMessage}>
-              Prati
-            </button>
-
-          </div>
-
+        
        
 
       {modalVisible && (
