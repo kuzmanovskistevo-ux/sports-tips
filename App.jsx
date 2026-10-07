@@ -167,6 +167,7 @@ useEffect(() => {
   window.chatovodOnLoad = window.chatovodOnLoad || [];
 
   window.chatovodOnLoad.push(function () {
+        console.log('CHATOVOD READY');
     window.chatovod.addChatToDivId('chat_tipdh', {
       host: 'tipdh.chatovod.com',
       width: '100%',
