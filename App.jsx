@@ -166,7 +166,6 @@ const loginAdmin = async () => {
 
    return (
     <div className="app">
-      <div id="chat_tipdh"></div>
       {!isAdmin && (
   <div className="admin-login">
     <input
