@@ -166,6 +166,15 @@ const loginAdmin = async () => {
 
    return (
     <div className="app">
+      <iframe
+  src="/chat.html"
+  title="TIPDH CHAT"
+  style={{
+    width: '100%',
+    height: '400px',
+    border: 'none'
+  }}
+></iframe>
       {!isAdmin && (
   <div className="admin-login">
     <input
