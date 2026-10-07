@@ -47,14 +47,6 @@ useEffect(() => {
 
   fetchTips()
 }, [])
-  const [messages, setMessages] = useState([
-    { id: 1, user: 'Marko', text: 'Shto mislite za Bayern vecher?', time: '19:40' },
-    { id: 2, user: 'Analyst', text: 'Partizan ima dobra kvota 2.45!', time: '19:42' },
-    { id: 3, user: 'Stefan', text: 'Jas ja igrav Barca 1 i 3+ 👌', time: '19:45' }
-  ]);
-
-  const [userName, setUserName] = useState('Gostin');
-  const [inputMsg, setInputMsg] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
   const [newMatch, setNewMatch] = useState('');
