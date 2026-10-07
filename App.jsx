@@ -417,9 +417,7 @@ const loginAdmin = async () => {
 
           </div>
 
-        </main>
-
-      )}
+       
 
       {modalVisible && (
 
