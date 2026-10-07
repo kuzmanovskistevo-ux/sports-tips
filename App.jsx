@@ -228,13 +228,6 @@ const loginAdmin = async () => {
         >
           🎯 Tips & Odds
         </button>
-
-        <button
-          className={activeTab === 'chat' ? 'tab active' : 'tab'}
-          onClick={() => setActiveTab('chat')}
-        >
-          💬 Fan Chat ({messages.length})
-        </button>
       </div>
 
       {activeTab === 'tipovi' && (
