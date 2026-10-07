@@ -364,7 +364,7 @@ const loginAdmin = async () => {
         </main>
       ) : (
 
-        <main className="chat">
+        
 
           <div className="nickname">
             <span>Your name:</span>
