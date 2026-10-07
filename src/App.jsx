@@ -166,6 +166,15 @@ const loginAdmin = async () => {
 
    return (
     <div className="app">
+      <div style={{
+  background: 'red',
+  color: 'white',
+  padding: '30px',
+  fontSize: '30px',
+  textAlign: 'center'
+}}>
+  TIPDH TEST
+</div>
       {!isAdmin && (
   <div className="admin-login">
     <input
