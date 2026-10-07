@@ -166,6 +166,7 @@ const loginAdmin = async () => {
 
    return (
     <div className="app">
+      <h2 style={{textAlign: 'center'}}>TIPDH CHAT TEST</h2>
       <iframe
   src="/chat.html"
   title="TIPDH CHAT"
