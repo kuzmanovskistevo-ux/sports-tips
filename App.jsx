@@ -163,33 +163,7 @@ const loginAdmin = async () => {
 
     setInputMsg('');
   };
-useEffect(() => {
-  window.chatovodOnLoad = window.chatovodOnLoad || [];
 
-  window.chatovodOnLoad.push(function () {
-        console.log('CHATOVOD READY');
-    window.chatovod.addChatToDivId('chat_tipdh', {
-      host: 'tipdh.chatovod.com',
-      width: '100%',
-      height: 380,
-      defaultLanguage: 'en'
-    });
-  });
-
-  const script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.charset = 'UTF-8';
-  script.async = true;
-  script.src = 'https://st1.chatovod.com/api/js/v1.js?4';
-
-  document.body.appendChild(script);
-
-  return () => {
-    if (script.parentNode) {
-      script.parentNode.removeChild(script);
-    }
-  };
-}, []);
    return (
     <div className="app">
       <div id="chat_tipdh"></div>
