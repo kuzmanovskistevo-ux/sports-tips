@@ -163,9 +163,31 @@ const loginAdmin = async () => {
 
     setInputMsg('');
   };
+useEffect(() => {
+  const script = document.createElement('script');
+  script.src = 'https://st1.chatovod.com/api/js/v1.js?4';
+  script.async = true;
 
+  script.onload = () => {
+    if (window.chatovod) {
+      window.chatovod.addChatToDivId('chat_tipdh', {
+        host: 'tipdh.chatovod.com',
+        width: '100%',
+        height: 380,
+        defaultLanguage: 'en'
+      });
+    }
+  };
+
+  document.body.appendChild(script);
+
+  return () => {
+    document.body.removeChild(script);
+  };
+}, []);
    return (
     <div className="app">
+      <div id="chat_tipdh"></div>
       {!isAdmin && (
   <div className="admin-login">
     <input
