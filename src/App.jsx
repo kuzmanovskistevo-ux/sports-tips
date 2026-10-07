@@ -48,6 +48,20 @@ useEffect(() => {
 
   fetchTips()
 }, [])
+  useEffect(() => {
+  const script = document.createElement('script')
+  script.src = 'https://www.stats4u.net/s4u.js'
+  script.setAttribute('data-id', '5908479899')
+  script.setAttribute('data-style', '950')
+  script.setAttribute('data-params', 'form=panel&pal=night&el=1,2,3')
+  script.async = true
+
+  document.getElementById('stats4u-counter')?.appendChild(script)
+
+  return () => {
+    script.remove()
+  }
+}, [])
   const [messages, setMessages] = useState([
     { id: 1, user: 'Marko', text: 'Shto mislite za Bayern vecher?', time: '19:40' },
     { id: 2, user: 'Analyst', text: 'Partizan ima dobra kvota 2.45!', time: '19:42' },
@@ -166,6 +180,15 @@ const loginAdmin = async () => {
 
    return (
      <div className="app">
+       <div
+  id="stats4u-counter"
+  style={{
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    margin: '10px 0'
+  }}
+></div>
     <iframe
   src="/chat.html"
   title="TIPDH CHAT"
