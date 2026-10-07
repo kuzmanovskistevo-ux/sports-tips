@@ -9,6 +9,17 @@ function App() {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [tipovi, setTipovi] = useState([]);
+  useEffect(() => {
+  const script = document.createElement('script')
+  script.src = 'https://www.shoutbox.com/chat/17609'
+  script.async = true
+
+  document.getElementById('shoutbox-tipdh')?.appendChild(script)
+
+  return () => {
+    script.remove()
+  }
+}, [])
 
 useEffect(() => {
   const fetchTips = async () => {
@@ -176,6 +187,7 @@ const loginAdmin = async () => {
 }}>
   TIPDH TEST
 </div>
+      <div id="shoutbox-tipdh"></div>
       {!isAdmin && (
   <div className="admin-login">
     <input
