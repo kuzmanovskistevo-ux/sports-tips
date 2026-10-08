@@ -1,422 +1,911 @@
-import { useState } from 'react'
-import { supabase } from './supabase'
 import './App.css'
-import { useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 function App() {
-  const [activeTab, setActiveTab] = useState('tipovi');
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [tipovi, setTipovi] = useState([]);
-useEffect(() => {
-  const fetchTips = async () => {
-    const { data, error } = await supabase
-      .from('tips')
-      .select('*')
-      .order('created_at', { ascending: false })
+  const [page, setPage] = useState('home')
+  const [time, setTime] = useState(new Date())
+  const [showPublish, setShowPublish] = useState(false)
 
-    if (error) {
-      console.error('Грешка при читање tips:', error)
-      alert(error.message)
+  const [tips, setTips] = useState([
+    {
+      home: 'Real Madrid',
+      away: 'PSG',
+      date: '08.10.2026',
+      time: '20:45',
+      tip: '1',
+      odds: '1.40',
+      status: 'PENDING',
+      score: '',
+    },
+  ])
+
+  const [newTip, setNewTip] = useState({
+    home: '',
+    away: '',
+    date: '',
+    time: '',
+    tip: '',
+    odds: '',
+  })
+
+  const [editingIndex, setEditingIndex] = useState(null)
+
+  const [editData, setEditData] = useState({
+    score: '',
+    status: 'PENDING',
+  })
+
+  const [system, setSystem] = useState('TICKET')
+
+  const [mixMatches, setMixMatches] = useState([
+    {
+      home: 'Real Madrid',
+      away: 'PSG',
+      date: '2026-10-08',
+      time: '20:45',
+      tip: '1',
+      odds: '1.40',
+    },
+    {
+      home: 'Bayern',
+      away: 'Man Utd',
+      date: '2026-10-08',
+      time: '21:00',
+      tip: '1',
+      odds: '1.90',
+    },
+  ])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTime(new Date())
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
+
+  const totalOdds = useMemo(() => {
+    const values = mixMatches
+      .map((match) => parseFloat(match.odds))
+      .filter((odds) => Number.isFinite(odds) && odds > 0)
+
+    if (!values.length) return 0
+
+    return values.reduce(
+      (total, odds) => total * odds,
+      1
+    )
+  }, [mixMatches])
+
+  const addTip = () => {
+    if (
+      !newTip.home ||
+      !newTip.away ||
+      !newTip.date ||
+      !newTip.time ||
+      !newTip.tip ||
+      !newTip.odds
+    ) {
+      alert('Popolni gi site polinja.')
       return
     }
 
-    const formattedTips = (data || []).map((row) => ({
-      id: row.id,
-      match: row.title || `${row.home_team || ''} vs ${row.away_team || ''}`,
-      league: row.league || '⚽ Sports',
-      tip: row.tip || '',
-      kvota: row.odds ?? '',
-      sigurnost: row.confidence != null ? `${row.confidence}%` : '80%',
-      analiza: row.description || '',
-      status: row.status === 'won'
-  ? '🟢 WON'
-  : row.status === 'lost'
-  ? '🔴 LOST'
-  : '⏳ PENDING',
-      result: row.result || '',
-      statusColor: '#17A2B8'
-    }))
+    const tip = {
+      ...newTip,
+      status: 'PENDING',
+      score: '',
+    }
 
-    setTipovi(formattedTips)
+    setTips([tip, ...tips])
+
+    setNewTip({
+      home: '',
+      away: '',
+      date: '',
+      time: '',
+      tip: '',
+      odds: '',
+    })
+
+    setShowPublish(false)
   }
 
+  const openEdit = (index) => {
+    setEditingIndex(index)
 
-  
-
-  fetchTips()
-}, [])
-  const [modalVisible, setModalVisible] = useState(false);
-
-  const [newMatch, setNewMatch] = useState('');
-
-const [newLeague, setNewLeague] = useState('');
-
-const [newTip, setNewTip] = useState('');
-
-const [newKvota, setNewKvota] = useState('');
-
-const [newSigurnost, setNewSigurnost] = useState('');
-const [newAnaliza, setNewAnaliza] = useState('');
-
-const [newResult, setNewResult] = useState('');
-
-  const addTip = async () => {
-    console.log('KVOTA:', newKvota)
-    if (!newMatch || !newTip || !newKvota) return;
-const { data, error } = await supabase
-  .from('tips')
-  .insert({
-    title: newMatch,
-    result: newResult || 'pending',
-    description: newAnaliza || 'No extra analysis provided.',
-    tip: newTip,
-    odds: parseFloat(newKvota),
-    league: newLeague || '⚽ Sports',
-    home_team: newMatch.split(' vs ')[0]?.trim(),
-    away_team: newMatch.split(' vs ')[1]?.trim(),
-    status: 'upcoming',
-    confidence: Number(newSigurnost) || 80,
-    published: true,
-    source: 'manual'
-  })
-  .select()
-  .single()
-
-if (error) {
-  console.error('Грешка при зачувување:', error)
-  alert(error.message)
-  return
-}
-console.log('ZAPISANO VO SUPABASE:', data)
-    const newTipObject = {
-      id: data.id,
-      match: newMatch,
-      league: newLeague || '⚽ Sports',
-      tip: newTip,
-      kvota: newKvota,
-      sigurnost: newSigurnost || '80%',
-      analiza: newAnaliza || 'No extra analysis provided.',
-      status: row.result === 'won'
-  ? '🟢 WON'
-  : row.result === 'lost'
-  ? '🔴 LOST'
-  : row.status === 'finished'
-  ? '🏁 FINISHED'
-  : '⏳ Pending',
-      statusColor: '#17A2B8'
-    };
-
-    setTipovi([newTipObject, ...tipovi]);
-
-    setNewMatch('');
-    setNewLeague('');
-    setNewTip('');
-    setNewKvota('');
-    setNewSigurnost('');
-    setNewAnaliza('');
-    setModalVisible(false);
-    setNewResult('')
-  };
-const loginAdmin = async () => {
-  const { error } = await supabase.auth.signInWithPassword({
-    email: loginEmail,
-    password: loginPassword
-  })
-
-  if (error) {
-    alert(error.message)
-    return
+    setEditData({
+      score: tips[index].score || '',
+      status: tips[index].status || 'PENDING',
+    })
   }
 
-  setIsAdmin(true)
-  alert('Успешно се најави како админ!')
-}
-  const sendMessage = () => {
-    if (!inputMsg.trim()) return;
+  const saveEdit = () => {
+    const updatedTips = [...tips]
 
-    const now = new Date();
+    updatedTips[editingIndex] = {
+      ...updatedTips[editingIndex],
+      score: editData.score,
+      status: editData.status,
+    }
 
-    const time = `${now.getHours()}:${String(
-      now.getMinutes()
-    ).padStart(2, '0')}`;
+    setTips(updatedTips)
+    setEditingIndex(null)
+  }
 
-    setMessages([
-      ...messages,
+  const addMixMatch = () => {
+    setMixMatches([
+      ...mixMatches,
       {
-        id: Date.now(),
-        user: userName || 'Anonimen',
-        text: inputMsg,
-        time
-      }
-    ]);
-
-    setInputMsg('');
-  };
-
-   return (
-    <div className="app">
-      <h2 style={{textAlign: 'center'}}>TIPDH CHAT TEST</h2>
-     <div style={{
-  background: 'red',
-  color: 'white',
-  padding: '30px',
-  fontSize: '30px',
-  textAlign: 'center'
-}}>
-  TIPDH TEST
-</div>
-      
-      {!isAdmin && (
-  <div className="admin-login">
-    <input
-      type="email"
-      placeholder="Admin email"
-      value={loginEmail}
-      onChange={(e) => setLoginEmail(e.target.value)}
-    />
-
-    <input
-      type="password"
-      placeholder="Admin password"
-      value={loginPassword}
-      onChange={(e) => setLoginPassword(e.target.value)}
-    />
-
-    <button onClick={loginAdmin}>
-      ADMIN LOGIN
-    </button>
-  </div>
-)}
-
-{isAdmin && (
-  <div className="admin-login">
-    <strong>🟢 ADMIN MODE</strong>
-  </div>
-)}
-
-      <header className="header">
-        <h1>⚽ SPORTS TIPS & ANALYTICS</h1>
-        <p>Premium Predictions & Fan Community</p>
-      </header>
-
-      <div className="tabs">
-        <button
-          className={activeTab === 'tipovi' ? 'tab active' : 'tab'}
-          onClick={() => setActiveTab('tipovi')}
-        >
-          🎯 Tips & Odds
-        </button>
-      </div>
-
-      {activeTab === 'tipovi' && (
-  <button
-    className="add-button"
-    onClick={() => setModalVisible(true)}
-  >
-    ➕ POST NEW TIP / ANALYSIS
-  </button>
-)}
-
-      {activeTab === 'tipovi' ? (
-        <main className="content">
-
-          {tipovi.map((item) => (
-            <div className="tip-card" key={item.id}>
-
-              <div className="card-top">
-                <span className="league">{item.league}</span>
-                <span
-                  className="status"
-                  style={{
-  color:
-    item.status === 'won'
-      ? '#22c55e'
-      : item.status === 'lost'
-      ? '#ef4444'
-      : '#17A2B8'
-}}
-                >
-                  {item.status}
-                </span>
-                <select
-  value={item.status}
- onChange={async (e) => {
-  const newStatus = e.target.value
-
-  const { error } = await supabase
-    .from('tips')
-  .update({ status: newStatus })
-    .eq('id', item.id)
-
-  if (error) {
-    console.error('Грешка при промена на статус:', error)
-    alert(error.message)
-    return
+        home: '',
+        away: '',
+        date: '',
+        time: '',
+        tip: '',
+        odds: '',
+      },
+    ])
   }
 
-  setTipovi(
-    tipovi.map((tip) =>
-      tip.id === item.id
-        ? {
-            ...tip,
-            status: newStatus
-          }
-        : tip
-    )
-  )
-}}
->
-  <option value="upcoming">PENDING</option>
-  <option value="won">WON 🟢</option>
-  <option value="lost">LOST 🔴</option>
-</select>
-              </div>
+  const removeMixMatch = (index) => {
+    if (mixMatches.length === 1) return
 
-              <h2>{item.match}</h2>
-
-              <p className="analysis">
-                {item.analiza}
-              </p>
-
-              <div className="tip-box">
-
-                <div className="pick-section">
-  <span className="label">PICK / TIP</span>
-
-  <strong className="pick-value">
-    {item.tip}
-  </strong>
-
-  <small className="confidence">
-    Confidence: {item.sigurnost}
-  </small>
-</div>
-                <div className="odds">
-  <span>ODDS</span>
-  <strong>{item.kvota || item.odds}</strong>
-  {item.result && (
-  <div className="final-score">
-    <span className="label">FINAL SCORE</span>
-    <strong>{item.result}</strong>
-  </div>
-)}
-  <span className="label">Final Score</span>
-  <input
-  style={{ display: isAdmin ? 'block' : 'none' }}
-  value={item.result || ''}
-  placeholder="Final score"
-  onChange={(e) =>
-    setTipovi(
-      tipovi.map((tip) =>
-        tip.id === item.id
-          ? { ...tip, result: e.target.value }
-          : tip
+    setMixMatches(
+      mixMatches.filter(
+        (_, matchIndex) => matchIndex !== index
       )
     )
   }
-/><button
-  style={{ display: isAdmin ? 'block' : 'none' }}
-  onClick={async () => {
-    const { error } = await supabase
-      .from('tips')
-      .update({ result: item.result })
-      .eq('id', item.id)
 
-    if (error) {
-      alert(error.message)
+  const updateMixMatch = (index, field, value) => {
+    const updated = [...mixMatches]
+
+    updated[index] = {
+      ...updated[index],
+      [field]: value,
+    }
+
+    setMixMatches(updated)
+  }
+
+  const publishMix = () => {
+    const valid = mixMatches.every(
+      (match) =>
+        match.home &&
+        match.away &&
+        match.date &&
+        match.time &&
+        match.tip &&
+        match.odds
+    )
+
+    if (!valid) {
+      alert('Popolni gi site polinja vo MIX.')
       return
     }
 
-    alert('Result saved!')
-  }}
->
-  SAVE RESULT
-</button>
-</div>
+    alert('🎫 MIX e podgotven za objava.')
 
+    console.log({
+      type: 'MIX',
+      system,
+      matches: mixMatches,
+      totalOdds,
+    })
+  }
+
+  const statusClass = (status) => {
+    if (status === 'WIN') return 'win'
+    if (status === 'LOSS') return 'loss'
+    if (status === 'VOID') return 'void'
+    return 'pending'
+  }
+
+  const statusText = (status) => {
+    if (status === 'WIN') return '🏆 WIN'
+    if (status === 'LOSS') return '❌ LOSS'
+    if (status === 'VOID') return '↩️ VOID'
+    return '⏳ PENDING'
+  }
+
+  return (
+    <div className="app">
+
+      {/* HEADER */}
+      <header className="header">
+
+        <div className="brand">
+          <div className="logo">TIPDH</div>
+          <div className="subtitle">
+            SPORTS TIPS ⚽
+          </div>
+        </div>
+
+        <div className="clock">
+          🕐{' '}
+          {time.toLocaleTimeString('mk-MK', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+          })}
+        </div>
+
+        <nav className="nav">
+
+          <button
+            className={page === 'home' ? 'active' : ''}
+            onClick={() => setPage('home')}
+          >
+            🏠 HOME
+          </button>
+
+          <button
+            className={page === 'tips' ? 'active' : ''}
+            onClick={() => setPage('tips')}
+          >
+            🎯 TIPS
+          </button>
+
+          <button
+            className={page === 'mix' ? 'active' : ''}
+            onClick={() => setPage('mix')}
+          >
+            🎫 MIX
+          </button>
+
+          <button
+            className={
+              page === 'vip'
+                ? 'vip-active'
+                : 'vip-nav'
+            }
+            onClick={() => setPage('vip')}
+          >
+            ⭐ VIP
+          </button>
+
+          <button
+            className={
+              page === 'stats'
+                ? 'stats-active'
+                : 'stats-nav'
+            }
+            onClick={() => setPage('stats')}
+          >
+            📊 VISITORS
+          </button>
+
+        </nav>
+
+      </header>
+
+      <main className="main">
+
+        {/* HOME */}
+
+        {page === 'home' && (
+          <>
+            <section className="hero">
+
+              <div className="hero-ball">
+                ⚽
+              </div>
+
+              <h1>SPORTS TIPS</h1>
+
+              <p>
+                Dobredojde na TIPDH 🔥
+              </p>
+
+              <button
+                className="yellow-button"
+                onClick={() => setPage('tips')}
+              >
+                🎯 OTVORI TIPS
+              </button>
+
+            </section>
+
+            <section className="home-grid">
+
+              <div className="home-card">
+                <span>🎯</span>
+                <h2>SPORTS TIPS</h2>
+                <p>
+                  Najnovi sportski tipovi i rezultati.
+                </p>
+                <button
+                  onClick={() => setPage('tips')}
+                >
+                  OTVORI
+                </button>
+              </div>
+
+              <div className="home-card">
+                <span>🎫</span>
+                <h2>MIX TICKETS</h2>
+                <p>
+                  Povekje parovi vo eden tiket.
+                </p>
+                <button
+                  onClick={() => setPage('mix')}
+                >
+                  OTVORI
+                </button>
+              </div>
+
+              <div className="home-card vip-home-card">
+                <span>⭐</span>
+                <h2>VIP</h2>
+                <p>
+                  Premium zona — uskoro.
+                </p>
+                <button
+                  onClick={() => setPage('vip')}
+                >
+                  OTVORI
+                </button>
+              </div>
+
+              <div className="home-card stats-home-card">
+                <span>📊</span>
+                <h2>VISITORS</h2>
+                <p>
+                  Statistika na posetitelite.
+                </p>
+                <button
+                  onClick={() => setPage('stats')}
+                >
+                  OTVORI
+                </button>
+              </div>
+
+            </section>
+          </>
+        )}
+
+        {/* TIPS */}
+
+        {page === 'tips' && (
+          <>
+            <section className="page-title">
+              <h1>🎯 SPORTS TIPS</h1>
+              <p>
+                Tvoite sportski predlozi.
+              </p>
+            </section>
+
+            <button
+              className="yellow-button full-button"
+              onClick={() =>
+                setShowPublish(!showPublish)
+              }
+            >
+              {showPublish
+                ? '❌ CLOSE'
+                : '➕ PUBLISH TIP'}
+            </button>
+
+            {showPublish && (
+              <section className="publish-box">
+
+                <h2>📝 NOV TIP</h2>
+
+                <div className="form-grid">
+
+                  <input
+                    placeholder="🏠 Home team"
+                    value={newTip.home}
+                    onChange={(e) =>
+                      setNewTip({
+                        ...newTip,
+                        home: e.target.value,
+                      })
+                    }
+                  />
+
+                  <input
+                    placeholder="✈️ Away team"
+                    value={newTip.away}
+                    onChange={(e) =>
+                      setNewTip({
+                        ...newTip,
+                        away: e.target.value,
+                      })
+                    }
+                  />
+
+                  <input
+                    type="date"
+                    value={newTip.date}
+                    onChange={(e) =>
+                      setNewTip({
+                        ...newTip,
+                        date: e.target.value,
+                      })
+                    }
+                  />
+
+                  <input
+                    type="time"
+                    value={newTip.time}
+                    onChange={(e) =>
+                      setNewTip({
+                        ...newTip,
+                        time: e.target.value,
+                      })
+                    }
+                  />
+
+                  <input
+                    placeholder="🎯 TIP"
+                    value={newTip.tip}
+                    onChange={(e) =>
+                      setNewTip({
+                        ...newTip,
+                        tip: e.target.value,
+                      })
+                    }
+                  />
+
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="💰 ODDS"
+                    value={newTip.odds}
+                    onChange={(e) =>
+                      setNewTip({
+                        ...newTip,
+                        odds: e.target.value,
+                      })
+                    }
+                  />
+
+                </div>
+
+                <button
+                  className="yellow-button"
+                  onClick={addTip}
+                >
+                  🚀 PUBLISH TIP
+                </button>
+
+              </section>
+            )}
+
+            <section className="section-title">
+              <h2>🔥 TIPS</h2>
+              <span>{tips.length} TIPS</span>
+            </section>
+
+            {tips.map((tip, index) => (
+              <div
+                className="tip-card"
+                key={index}
+              >
+
+                <div className="match-info">
+
+                  <div className="teams">
+                    <strong>{tip.home}</strong>
+                    <span>vs</span>
+                    <strong>{tip.away}</strong>
+                  </div>
+
+                  <div className="match-time">
+                    <b>🕐 {tip.time}</b>
+                    <small>📅 {tip.date}</small>
+                  </div>
+
+                </div>
+
+                <div className="tip-row">
+
+                  <div className="tip-stat">
+                    <small>🎯 TIP</small>
+                    <strong>{tip.tip}</strong>
+                  </div>
+
+                  <div className="tip-stat">
+                    <small>💰 ODDS</small>
+                    <strong className="odds-value">
+                      {tip.odds}
+                    </strong>
+                  </div>
+
+                  <div className="tip-stat">
+                    <small>STATUS</small>
+                    <strong
+                      className={statusClass(
+                        tip.status
+                      )}
+                    >
+                      {statusText(tip.status)}
+                    </strong>
+                  </div>
+
+                </div>
+
+                {tip.score && (
+                  <div className="final-score">
+                    <small>⚽ FINAL SCORE</small>
+                    <strong>{tip.score}</strong>
+                  </div>
+                )}
+
+                {editingIndex === index ? (
+                  <div className="edit-box">
+
+                    <input
+                      placeholder="⚽ Final score e.g. 2:1"
+                      value={editData.score}
+                      onChange={(e) =>
+                        setEditData({
+                          ...editData,
+                          score: e.target.value,
+                        })
+                      }
+                    />
+
+                    <select
+                      value={editData.status}
+                      onChange={(e) =>
+                        setEditData({
+                          ...editData,
+                          status: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="PENDING">
+                        ⏳ PENDING
+                      </option>
+                      <option value="WIN">
+                        🏆 WIN
+                      </option>
+                      <option value="LOSS">
+                        ❌ LOSS
+                      </option>
+                      <option value="VOID">
+                        ↩️ VOID
+                      </option>
+                    </select>
+
+                    <button
+                      className="yellow-button"
+                      onClick={saveEdit}
+                    >
+                      💾 SAVE RESULT
+                    </button>
+
+                  </div>
+                ) : (
+                  <button
+                    className="edit-button"
+                    onClick={() => openEdit(index)}
+                  >
+                    ✏️ EDIT RESULT
+                  </button>
+                )}
+
+              </div>
+            ))}
+          </>
+        )}
+
+        {/* MIX */}
+
+        {page === 'mix' && (
+          <>
+            <section className="page-title">
+              <h1>🎫 MIX TICKET</h1>
+              <p>
+                Povekje parovi vo eden tiket.
+              </p>
+            </section>
+
+            <section className="system-box">
+
+              <label>📊 SYSTEM</label>
+
+              <select
+                value={system}
+                onChange={(e) =>
+                  setSystem(e.target.value)
+                }
+              >
+                <option value="TICKET">
+                  🎫 TICKET
+                </option>
+                <option value="2/3">
+                  2/3 SYSTEM
+                </option>
+                <option value="3/4">
+                  3/4 SYSTEM
+                </option>
+                <option value="4/5">
+                  4/5 SYSTEM
+                </option>
+                <option value="5/6">
+                  5/6 SYSTEM
+                </option>
+                <option value="6/7">
+                  6/7 SYSTEM
+                </option>
+                <option value="7/8">
+                  7/8 SYSTEM
+                </option>
+                <option value="8/10">
+                  8/10 SYSTEM
+                </option>
+              </select>
+
+            </section>
+
+            {mixMatches.map((match, index) => (
+              <div
+                className="mix-card"
+                key={index}
+              >
+
+                <div className="mix-header">
+
+                  <strong>
+                    ⚽ PAR {index + 1}
+                  </strong>
+
+                  {mixMatches.length > 1 && (
+                    <button
+                      className="remove-button"
+                      onClick={() =>
+                        removeMixMatch(index)
+                      }
+                    >
+                      🗑️
+                    </button>
+                  )}
+
+                </div>
+
+                <div className="form-grid">
+
+                  <input
+                    placeholder="🏠 Home team"
+                    value={match.home}
+                    onChange={(e) =>
+                      updateMixMatch(
+                        index,
+                        'home',
+                        e.target.value
+                      )
+                    }
+                  />
+
+                  <input
+                    placeholder="✈️ Away team"
+                    value={match.away}
+                    onChange={(e) =>
+                      updateMixMatch(
+                        index,
+                        'away',
+                        e.target.value
+                      )
+                    }
+                  />
+
+                  <input
+                    type="date"
+                    value={match.date}
+                    onChange={(e) =>
+                      updateMixMatch(
+                        index,
+                        'date',
+                        e.target.value
+                      )
+                    }
+                  />
+
+                  <input
+                    type="time"
+                    value={match.time}
+                    onChange={(e) =>
+                      updateMixMatch(
+                        index,
+                        'time',
+                        e.target.value
+                      )
+                    }
+                  />
+
+                  <input
+                    placeholder="🎯 TIP"
+                    value={match.tip}
+                    onChange={(e) =>
+                      updateMixMatch(
+                        index,
+                        'tip',
+                        e.target.value
+                      )
+                    }
+                  />
+
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="💰 ODDS"
+                    value={match.odds}
+                    onChange={(e) =>
+                      updateMixMatch(
+                        index,
+                        'odds',
+                        e.target.value
+                      )
+                    }
+                  />
+
+                </div>
+
+              </div>
+            ))}
+
+            <button
+              className="add-match-button"
+              onClick={addMixMatch}
+            >
+              ➕ ADD ANOTHER MATCH
+            </button>
+
+            <div className="total-odds">
+              <span>💰 TOTAL COEFFICIENT</span>
+              <strong>
+                {totalOdds
+                  ? totalOdds.toFixed(2)
+                  : '—'}
+              </strong>
+            </div>
+
+            <button
+              className="publish-mix-button"
+              onClick={publishMix}
+            >
+              🚀 PUBLISH MIX
+            </button>
+          </>
+        )}
+
+        {/* VIP */}
+
+        {page === 'vip' && (
+          <section className="vip-page">
+
+            <div className="vip-star">⭐</div>
+
+            <h1>VIP TIPS</h1>
+
+            <p>PREMIUM SPORTS ZONE</p>
+
+            <div className="vip-box">
+
+              <h2>🔥 VIP ZONA</h2>
+
+              <p>
+                Ekskluzivni tipovi, premium MIX i
+                podetalna statistika.
+              </p>
+
+              <div className="vip-list">
+                <div>⭐ Premium Tips</div>
+                <div>🎫 Exclusive MIX</div>
+                <div>📊 Detailed Statistics</div>
+                <div>⚡ VIP Notifications</div>
+              </div>
+
+              <button>
+                🔒 VIP PRETPLATA — USKORO
+              </button>
+
+            </div>
+
+          </section>
+        )}
+
+        {/* VISITORS */}
+
+        {page === 'stats' && (
+          <section className="stats-page">
+
+            <div className="page-title">
+              <h1>📊 VISITORS & STATISTICS</h1>
+
+              <p>
+                Pregled na posetitelite na TIPDH.
+              </p>
+            </div>
+
+            <div className="stats-grid">
+
+              <div className="stats-card">
+                <span>👥</span>
+                <h2>VISITORS</h2>
+                <p>
+                  Realni posetiteli
+                </p>
+              </div>
+
+              <div className="stats-card">
+                <span>🌍</span>
+                <h2>COUNTRIES</h2>
+                <p>
+                  Od koi drzavi doagaat
+                </p>
+              </div>
+
+              <div className="stats-card">
+                <span>📍</span>
+                <h2>CITIES</h2>
+                <p>
+                  Gradovi na posetitelite
+                </p>
+              </div>
+
+              <div className="stats-card">
+                <span>🔎</span>
+                <h2>SOURCES</h2>
+                <p>
+                  Google, Facebook, direktno...
+                </p>
               </div>
 
             </div>
-          ))}
 
-        </main>
-      ) : (
+            <div className="analytics-box">
 
-        
-       
+              <h2>📈 TIPDH ANALYTICS</h2>
 
-      {modalVisible && (
+              <p>
+                Ovde ke ja stavime vistinskata
+                statistika za posetitelite.
+              </p>
 
-        <div className="modal-background">
+              <div className="analytics-list">
 
-          <div className="modal">
+                <div>
+                  👥 Vkupno poseti
+                </div>
 
-            <h2>🏀 Post New Tip & Analysis</h2>
+                <div>
+                  🌍 Drzavi
+                </div>
 
-            <input
-              placeholder="Match (e.g. Bayern vs Partizan)"
-              value={newMatch}
-              onChange={(e) => setNewMatch(e.target.value)}
-            />
+                <div>
+                  📍 Gradovi
+                </div>
 
-            <input
-              placeholder="League (e.g. 🏀 EuroLeague)"
-              value={newLeague}
-              onChange={(e) => setNewLeague(e.target.value)}
-            />
+                <div>
+                  🔎 Od kade doagaat
+                </div>
 
-            <div className="two-inputs">
+              </div>
 
-              <input
-                placeholder="Pick / Tip"
-                value={newTip}
-                onChange={(e) => setNewTip(e.target.value)}
-              />
-
-              <input
-                placeholder="Odds"
-                value={newKvota}
-                onChange={(e) => setNewKvota(e.target.value)}
-              />
+              <p className="analytics-note">
+                Statistikatа ke se povrze so
+                Google Analytics otkako ke ja
+                sredime stranata.
+              </p>
 
             </div>
 
-            <input
-              placeholder="Confidence (e.g. 80%)"
-              value={newSigurnost}
-              onChange={(e) => setNewSigurnost(e.target.value)}
-            />
+          </section>
+        )}
 
-            <textarea
-              placeholder="Short match analysis..."
-              value={newAnaliza}
-              onChange={(e) => setNewAnaliza(e.target.value)}
-            />
+      </main>
 
-            <button
-              className="publish"
-              onClick={addTip}
-            >
-              PUBLISH NOW
-            </button>
-
-            <button
-              className="cancel"
-              onClick={() => setModalVisible(false)}
-            >
-              Cancel
-            </button>
-
-          </div>
-
-        </div>
-
-      )}
+      <footer className="footer">
+        <p>
+          © 2026 TIPDH • SPORTS TIPS ⚽🔥
+        </p>
+      </footer>
 
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
