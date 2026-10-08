@@ -1,781 +1,122 @@
 import './App.css'
-import { useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
 
 function App() {
   const [page, setPage] = useState('home')
-  const [time, setTime] = useState(new Date())
-  const [showPublish, setShowPublish] = useState(false)
-
-  const [tips, setTips] = useState([
-    {
-      home: 'Real Madrid',
-      away: 'PSG',
-      date: '08.10.2026',
-      time: '20:45',
-      tip: '1',
-      odds: '1.40',
-      status: 'PENDING',
-      score: '',
-    },
-  ])
-
-  const [newTip, setNewTip] = useState({
-    home: '',
-    away: '',
-    date: '',
-    time: '',
-    tip: '',
-    odds: '',
-  })
-
-  const [editingIndex, setEditingIndex] = useState(null)
-
-  const [editData, setEditData] = useState({
-    score: '',
-    status: 'PENDING',
-  })
-
-  const [system, setSystem] = useState('TICKET')
-
-  const [mixMatches, setMixMatches] = useState([
-    {
-      home: 'Real Madrid',
-      away: 'PSG',
-      date: '2026-10-08',
-      time: '20:45',
-      tip: '1',
-      odds: '1.40',
-    },
-    {
-      home: 'Bayern',
-      away: 'Man Utd',
-      date: '2026-10-08',
-      time: '21:00',
-      tip: '1',
-      odds: '1.90',
-    },
-  ])
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTime(new Date())
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
-
-  const totalOdds = useMemo(() => {
-    const values = mixMatches
-      .map((match) => parseFloat(match.odds))
-      .filter((odds) => Number.isFinite(odds) && odds > 0)
-
-    if (!values.length) return 0
-
-    return values.reduce(
-      (total, odds) => total * odds,
-      1
-    )
-  }, [mixMatches])
-
-  const addTip = () => {
-    if (
-      !newTip.home ||
-      !newTip.away ||
-      !newTip.date ||
-      !newTip.time ||
-      !newTip.tip ||
-      !newTip.odds
-    ) {
-      alert('Popolni gi site polinja.')
-      return
-    }
-
-    const tip = {
-      ...newTip,
-      status: 'PENDING',
-      score: '',
-    }
-
-    setTips([tip, ...tips])
-
-    setNewTip({
-      home: '',
-      away: '',
-      date: '',
-      time: '',
-      tip: '',
-      odds: '',
-    })
-
-    setShowPublish(false)
-  }
-
-  const openEdit = (index) => {
-    setEditingIndex(index)
-
-    setEditData({
-      score: tips[index].score || '',
-      status: tips[index].status || 'PENDING',
-    })
-  }
-
-  const saveEdit = () => {
-    const updatedTips = [...tips]
-
-    updatedTips[editingIndex] = {
-      ...updatedTips[editingIndex],
-      score: editData.score,
-      status: editData.status,
-    }
-
-    setTips(updatedTips)
-    setEditingIndex(null)
-  }
-
-  const addMixMatch = () => {
-    setMixMatches([
-      ...mixMatches,
-      {
-        home: '',
-        away: '',
-        date: '',
-        time: '',
-        tip: '',
-        odds: '',
-      },
-    ])
-  }
-
-  const removeMixMatch = (index) => {
-    if (mixMatches.length === 1) return
-
-    setMixMatches(
-      mixMatches.filter(
-        (_, matchIndex) => matchIndex !== index
-      )
-    )
-  }
-
-  const updateMixMatch = (index, field, value) => {
-    const updated = [...mixMatches]
-
-    updated[index] = {
-      ...updated[index],
-      [field]: value,
-    }
-
-    setMixMatches(updated)
-  }
-
-  const publishMix = () => {
-    const valid = mixMatches.every(
-      (match) =>
-        match.home &&
-        match.away &&
-        match.date &&
-        match.time &&
-        match.tip &&
-        match.odds
-    )
-
-    if (!valid) {
-      alert('Popolni gi site polinja vo MIX.')
-      return
-    }
-
-    alert('🎫 MIX e podgotven za objava.')
-
-    console.log({
-      type: 'MIX',
-      system,
-      matches: mixMatches,
-      totalOdds,
-    })
-  }
-
-  const statusClass = (status) => {
-    if (status === 'WIN') return 'win'
-    if (status === 'LOSS') return 'loss'
-    if (status === 'VOID') return 'void'
-    return 'pending'
-  }
-
-  const statusText = (status) => {
-    if (status === 'WIN') return '🏆 WIN'
-    if (status === 'LOSS') return '❌ LOSS'
-    if (status === 'VOID') return '↩️ VOID'
-    return '⏳ PENDING'
-  }
 
   return (
     <div className="app">
-
-      {/* HEADER */}
       <header className="header">
-
-        <div className="brand">
-          <div className="logo">TIPDH</div>
-          <div className="subtitle">
-            SPORTS TIPS ⚽
-          </div>
-        </div>
-
-        <div className="clock">
-          🕐{' '}
-          {time.toLocaleTimeString('mk-MK', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-          })}
-        </div>
+        <div className="logo">TIPDH</div>
 
         <nav className="nav">
-
-          <button
-            className={page === 'home' ? 'active' : ''}
-            onClick={() => setPage('home')}
-          >
-            🏠 HOME
-          </button>
-
-          <button
-            className={page === 'tips' ? 'active' : ''}
-            onClick={() => setPage('tips')}
-          >
-            🎯 TIPS
-          </button>
-
-          <button
-            className={page === 'mix' ? 'active' : ''}
-            onClick={() => setPage('mix')}
-          >
-            🎫 MIX
-          </button>
-
-          <button
-            className={
-              page === 'vip'
-                ? 'vip-active'
-                : 'vip-nav'
-            }
-            onClick={() => setPage('vip')}
-          >
-            ⭐ VIP
-          </button>
-
-          <button
-            className={
-              page === 'stats'
-                ? 'stats-active'
-                : 'stats-nav'
-            }
-            onClick={() => setPage('stats')}
-          >
-            📊 VISITORS
-          </button>
-
+          <button onClick={() => setPage('home')}>🏠 HOME</button>
+          <button onClick={() => setPage('tips')}>🎯 TIPS</button>
+          <button onClick={() => setPage('mix')}>🎫 MIX</button>
+          <button onClick={() => setPage('vip')}>⭐ VIP</button>
+          <button onClick={() => setPage('stats')}>📊 VISITORS</button>
         </nav>
-
       </header>
 
       <main className="main">
+         {page === 'home' && (
+          <section className="hero">
+            <div className="hero-ball">⚽</div>
 
-        {/* HOME */}
+            <h1>SPORTS TIPS</h1>
 
-        {page === 'home' && (
-          <>
-            <section className="hero">
+            <p>Dobredojde na TIPDH 🔥</p>
 
-              <div className="hero-ball">
-                ⚽
-              </div>
-
-              <h1>SPORTS TIPS</h1>
-
-              <p>
-                Dobredojde na TIPDH 🔥
-              </p>
-
-              <button
-                className="yellow-button"
-                onClick={() => setPage('tips')}
-              >
-                🎯 OTVORI TIPS
-              </button>
-
-            </section>
-
-            <section className="home-grid">
-
-              <div className="home-card">
-                <span>🎯</span>
-                <h2>SPORTS TIPS</h2>
-                <p>
-                  Najnovi sportski tipovi i rezultati.
-                </p>
-                <button
-                  onClick={() => setPage('tips')}
-                >
-                  OTVORI
-                </button>
-              </div>
-
-              <div className="home-card">
-                <span>🎫</span>
-                <h2>MIX TICKETS</h2>
-                <p>
-                  Povekje parovi vo eden tiket.
-                </p>
-                <button
-                  onClick={() => setPage('mix')}
-                >
-                  OTVORI
-                </button>
-              </div>
-
-              <div className="home-card vip-home-card">
-                <span>⭐</span>
-                <h2>VIP</h2>
-                <p>
-                  Premium zona — uskoro.
-                </p>
-                <button
-                  onClick={() => setPage('vip')}
-                >
-                  OTVORI
-                </button>
-              </div>
-
-              <div className="home-card stats-home-card">
-                <span>📊</span>
-                <h2>VISITORS</h2>
-                <p>
-                  Statistika na posetitelite.
-                </p>
-                <button
-                  onClick={() => setPage('stats')}
-                >
-                  OTVORI
-                </button>
-              </div>
-
-            </section>
-          </>
+            <button
+              className="yellow-button"
+              onClick={() => setPage('tips')}
+            >
+              🎯 OTVORI TIPS
+            </button>
+          </section>
         )}
-
-        {/* TIPS */}
 
         {page === 'tips' && (
-          <>
-            <section className="page-title">
+          <section>
+            <div className="page-title">
               <h1>🎯 SPORTS TIPS</h1>
-              <p>
-                Tvoite sportski predlozi.
-              </p>
-            </section>
+              <p>Najnovi sportski tipovi</p>
+            </div>
 
-            <button
-              className="yellow-button full-button"
-              onClick={() =>
-                setShowPublish(!showPublish)
-              }
-            >
-              {showPublish
-                ? '❌ CLOSE'
-                : '➕ PUBLISH TIP'}
-            </button>
-
-            {showPublish && (
-              <section className="publish-box">
-
-                <h2>📝 NOV TIP</h2>
-
-                <div className="form-grid">
-
-                  <input
-                    placeholder="🏠 Home team"
-                    value={newTip.home}
-                    onChange={(e) =>
-                      setNewTip({
-                        ...newTip,
-                        home: e.target.value,
-                      })
-                    }
-                  />
-
-                  <input
-                    placeholder="✈️ Away team"
-                    value={newTip.away}
-                    onChange={(e) =>
-                      setNewTip({
-                        ...newTip,
-                        away: e.target.value,
-                      })
-                    }
-                  />
-
-                  <input
-                    type="date"
-                    value={newTip.date}
-                    onChange={(e) =>
-                      setNewTip({
-                        ...newTip,
-                        date: e.target.value,
-                      })
-                    }
-                  />
-
-                  <input
-                    type="time"
-                    value={newTip.time}
-                    onChange={(e) =>
-                      setNewTip({
-                        ...newTip,
-                        time: e.target.value,
-                      })
-                    }
-                  />
-
-                  <input
-                    placeholder="🎯 TIP"
-                    value={newTip.tip}
-                    onChange={(e) =>
-                      setNewTip({
-                        ...newTip,
-                        tip: e.target.value,
-                      })
-                    }
-                  />
-
-                  <input
-                    type="number"
-                    step="0.01"
-                    placeholder="💰 ODDS"
-                    value={newTip.odds}
-                    onChange={(e) =>
-                      setNewTip({
-                        ...newTip,
-                        odds: e.target.value,
-                      })
-                    }
-                  />
-
+            <div className="tip-card">
+              <div className="match-info">
+                <div className="teams">
+                  <strong>Real Madrid</strong>
+                  <span>vs</span>
+                  <strong>PSG</strong>
                 </div>
 
-                <button
-                  className="yellow-button"
-                  onClick={addTip}
-                >
-                  🚀 PUBLISH TIP
-                </button>
-
-              </section>
-            )}
-
-            <section className="section-title">
-              <h2>🔥 TIPS</h2>
-              <span>{tips.length} TIPS</span>
-            </section>
-
-            {tips.map((tip, index) => (
-              <div
-                className="tip-card"
-                key={index}
-              >
-
-                <div className="match-info">
-
-                  <div className="teams">
-                    <strong>{tip.home}</strong>
-                    <span>vs</span>
-                    <strong>{tip.away}</strong>
-                  </div>
-
-                  <div className="match-time">
-                    <b>🕐 {tip.time}</b>
-                    <small>📅 {tip.date}</small>
-                  </div>
-
+                <div className="match-time">
+                  <b>🕐 20:45</b>
+                  <small>📅 08.10.2026</small>
                 </div>
-
-                <div className="tip-row">
-
-                  <div className="tip-stat">
-                    <small>🎯 TIP</small>
-                    <strong>{tip.tip}</strong>
-                  </div>
-
-                  <div className="tip-stat">
-                    <small>💰 ODDS</small>
-                    <strong className="odds-value">
-                      {tip.odds}
-                    </strong>
-                  </div>
-
-                  <div className="tip-stat">
-                    <small>STATUS</small>
-                    <strong
-                      className={statusClass(
-                        tip.status
-                      )}
-                    >
-                      {statusText(tip.status)}
-                    </strong>
-                  </div>
-
-                </div>
-
-                {tip.score && (
-                  <div className="final-score">
-                    <small>⚽ FINAL SCORE</small>
-                    <strong>{tip.score}</strong>
-                  </div>
-                )}
-
-                {editingIndex === index ? (
-                  <div className="edit-box">
-
-                    <input
-                      placeholder="⚽ Final score e.g. 2:1"
-                      value={editData.score}
-                      onChange={(e) =>
-                        setEditData({
-                          ...editData,
-                          score: e.target.value,
-                        })
-                      }
-                    />
-
-                    <select
-                      value={editData.status}
-                      onChange={(e) =>
-                        setEditData({
-                          ...editData,
-                          status: e.target.value,
-                        })
-                      }
-                    >
-                      <option value="PENDING">
-                        ⏳ PENDING
-                      </option>
-                      <option value="WIN">
-                        🏆 WIN
-                      </option>
-                      <option value="LOSS">
-                        ❌ LOSS
-                      </option>
-                      <option value="VOID">
-                        ↩️ VOID
-                      </option>
-                    </select>
-
-                    <button
-                      className="yellow-button"
-                      onClick={saveEdit}
-                    >
-                      💾 SAVE RESULT
-                    </button>
-
-                  </div>
-                ) : (
-                  <button
-                    className="edit-button"
-                    onClick={() => openEdit(index)}
-                  >
-                    ✏️ EDIT RESULT
-                  </button>
-                )}
-
               </div>
-            ))}
-          </>
+
+              <div className="tip-row">
+                <div className="tip-stat">
+                  <small>🎯 TIP</small>
+                  <strong>1</strong>
+                </div>
+
+                <div className="tip-stat">
+                  <small>💰 ODDS</small>
+                  <strong>1.40</strong>
+                </div>
+
+                <div className="tip-stat">
+                  <small>STATUS</small>
+                  <strong className="pending">
+                    ⏳ PENDING
+                  </strong>
+                </div>
+              </div>
+            </div>
+          </section>
         )}
 
-        {/* MIX */}
-
         {page === 'mix' && (
-          <>
-            <section className="page-title">
+          <section>
+            <div className="page-title">
               <h1>🎫 MIX TICKET</h1>
-              <p>
-                Povekje parovi vo eden tiket.
-              </p>
-            </section>
+              <p>Povekje parovi vo eden tiket</p>
+            </div>
 
-            <section className="system-box">
+            <div className="mix-card">
+              <h2>⚽ PAR 1</h2>
 
-              <label>📊 SYSTEM</label>
-
-              <select
-                value={system}
-                onChange={(e) =>
-                  setSystem(e.target.value)
-                }
-              >
-                <option value="TICKET">
-                  🎫 TICKET
-                </option>
-                <option value="2/3">
-                  2/3 SYSTEM
-                </option>
-                <option value="3/4">
-                  3/4 SYSTEM
-                </option>
-                <option value="4/5">
-                  4/5 SYSTEM
-                </option>
-                <option value="5/6">
-                  5/6 SYSTEM
-                </option>
-                <option value="6/7">
-                  6/7 SYSTEM
-                </option>
-                <option value="7/8">
-                  7/8 SYSTEM
-                </option>
-                <option value="8/10">
-                  8/10 SYSTEM
-                </option>
-              </select>
-
-            </section>
-
-            {mixMatches.map((match, index) => (
-              <div
-                className="mix-card"
-                key={index}
-              >
-
-                <div className="mix-header">
-
-                  <strong>
-                    ⚽ PAR {index + 1}
-                  </strong>
-
-                  {mixMatches.length > 1 && (
-                    <button
-                      className="remove-button"
-                      onClick={() =>
-                        removeMixMatch(index)
-                      }
-                    >
-                      🗑️
-                    </button>
-                  )}
-
-                </div>
-
-                <div className="form-grid">
-
-                  <input
-                    placeholder="🏠 Home team"
-                    value={match.home}
-                    onChange={(e) =>
-                      updateMixMatch(
-                        index,
-                        'home',
-                        e.target.value
-                      )
-                    }
-                  />
-
-                  <input
-                    placeholder="✈️ Away team"
-                    value={match.away}
-                    onChange={(e) =>
-                      updateMixMatch(
-                        index,
-                        'away',
-                        e.target.value
-                      )
-                    }
-                  />
-
-                  <input
-                    type="date"
-                    value={match.date}
-                    onChange={(e) =>
-                      updateMixMatch(
-                        index,
-                        'date',
-                        e.target.value
-                      )
-                    }
-                  />
-
-                  <input
-                    type="time"
-                    value={match.time}
-                    onChange={(e) =>
-                      updateMixMatch(
-                        index,
-                        'time',
-                        e.target.value
-                      )
-                    }
-                  />
-
-                  <input
-                    placeholder="🎯 TIP"
-                    value={match.tip}
-                    onChange={(e) =>
-                      updateMixMatch(
-                        index,
-                        'tip',
-                        e.target.value
-                      )
-                    }
-                  />
-
-                  <input
-                    type="number"
-                    step="0.01"
-                    placeholder="💰 ODDS"
-                    value={match.odds}
-                    onChange={(e) =>
-                      updateMixMatch(
-                        index,
-                        'odds',
-                        e.target.value
-                      )
-                    }
-                  />
-
-                </div>
-
+              <div className="mix-match">
+                <strong>Real Madrid</strong>
+                <span>vs</span>
+                <strong>PSG</strong>
+                <b>1.40</b>
               </div>
-            ))}
+            </div>
 
-            <button
-              className="add-match-button"
-              onClick={addMixMatch}
-            >
-              ➕ ADD ANOTHER MATCH
-            </button>
+            <div className="mix-card">
+              <h2>⚽ PAR 2</h2>
+
+              <div className="mix-match">
+                <strong>Bayern</strong>
+                <span>vs</span>
+                <strong>Man Utd</strong>
+                <b>1.90</b>
+              </div>
+            </div>
 
             <div className="total-odds">
               <span>💰 TOTAL COEFFICIENT</span>
-              <strong>
-                {totalOdds
-                  ? totalOdds.toFixed(2)
-                  : '—'}
-              </strong>
+              <strong>2.66</strong>
             </div>
-
-            <button
-              className="publish-mix-button"
-              onClick={publishMix}
-            >
-              🚀 PUBLISH MIX
-            </button>
-          </>
+          </section>
         )}
-
-        {/* VIP */}
 
         {page === 'vip' && (
           <section className="vip-page">
-
             <div className="vip-star">⭐</div>
 
             <h1>VIP TIPS</h1>
@@ -783,12 +124,10 @@ function App() {
             <p>PREMIUM SPORTS ZONE</p>
 
             <div className="vip-box">
-
               <h2>🔥 VIP ZONA</h2>
 
               <p>
-                Ekskluzivni tipovi, premium MIX i
-                podetalna statistika.
+                Ekskluzivni tipovi i premium MIX.
               </p>
 
               <div className="vip-list">
@@ -801,109 +140,52 @@ function App() {
               <button>
                 🔒 VIP PRETPLATA — USKORO
               </button>
-
             </div>
-
           </section>
         )}
 
-        {/* VISITORS */}
-
         {page === 'stats' && (
           <section className="stats-page">
-
             <div className="page-title">
-              <h1>📊 VISITORS & STATISTICS</h1>
+              <h1>📊 VISITORS</h1>
 
               <p>
-                Pregled na posetitelite na TIPDH.
+                Statistika na posetitelite na TIPDH.
               </p>
             </div>
 
             <div className="stats-grid">
-
               <div className="stats-card">
                 <span>👥</span>
                 <h2>VISITORS</h2>
-                <p>
-                  Realni posetiteli
-                </p>
+                <p>Vkupno poseti</p>
               </div>
 
               <div className="stats-card">
                 <span>🌍</span>
                 <h2>COUNTRIES</h2>
-                <p>
-                  Od koi drzavi doagaat
-                </p>
+                <p>Drzavi</p>
               </div>
 
               <div className="stats-card">
                 <span>📍</span>
                 <h2>CITIES</h2>
-                <p>
-                  Gradovi na posetitelite
-                </p>
+                <p>Gradovi</p>
               </div>
 
               <div className="stats-card">
                 <span>🔎</span>
                 <h2>SOURCES</h2>
-                <p>
-                  Google, Facebook, direktno...
-                </p>
+                <p>Od kade doagaat</p>
               </div>
-
             </div>
-
-            <div className="analytics-box">
-
-              <h2>📈 TIPDH ANALYTICS</h2>
-
-              <p>
-                Ovde ke ja stavime vistinskata
-                statistika za posetitelite.
-              </p>
-
-              <div className="analytics-list">
-
-                <div>
-                  👥 Vkupno poseti
-                </div>
-
-                <div>
-                  🌍 Drzavi
-                </div>
-
-                <div>
-                  📍 Gradovi
-                </div>
-
-                <div>
-                  🔎 Od kade doagaat
-                </div>
-
-              </div>
-
-              <p className="analytics-note">
-                Statistikatа ke se povrze so
-                Google Analytics otkako ke ja
-                sredime stranata.
-              </p>
-
-            </div>
-
           </section>
         )}
-
-      </main>
+              </main>
 
       <footer className="footer">
-        <p>
-          © 2026 TIPDH • SPORTS TIPS ⚽🔥
-        </p>
+        <p>© 2026 TIPDH • SPORTS TIPS ⚽🔥</p>
       </footer>
-
     </div>
   )
 }
